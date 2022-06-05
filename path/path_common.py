@@ -1,15 +1,83 @@
 import random
-
 import numpy as np
 import config
+import copy
+from tools.distance import *
 
 
+# 翻转路径段
 def reverse_path(path):
     re_path = path.copy()
     re_path[1:-1] = re_path[-2:0:-1]
     return re_path
 
 
+# 从路径中随机选取一段路径，返回起始位置、结尾位置、选中的路径段
+def generate_random_path(path):
+    a = np.random.randint(len(path))
+    while True:
+        b = np.random.randint(len(path))
+        if np.abs(a - b) > 1:
+            break
+    if a > b:
+        return b, a, path[b:a + 1]
+    else:
+        return a, b, path[a:b + 1]
+
+
+# 使用贪心算法生成初始种群
+def create_origin_greedy(distance_graph):
+    t1 = random.randint(0, len(distance_graph) - 1)
+    flag = [0 for i in range(len(distance_graph))]
+    population = [-1 for i in range(len(distance_graph))]
+    population[0] = t1
+    flag[t1] = 1
+    for i in range(0, len(distance_graph) - 1):
+        min1 = 100000
+        for j in range(len(distance_graph)):
+            if flag[j]:
+                continue
+            if distance_graph[population[i]][j] < min1:
+                min1 = distance_graph[population[i]][j]
+                temp1 = j
+        flag[temp1] = 1
+        population[i + 1] = temp1
+
+    return population
+
+
+# 计算适应度
+def eva_fitness0(distance_graph, path_list):
+    temp = 0
+    for i in range(len(path_list) - 1):
+        temp += distance_graph[path_list[i + 1]][path_list[i]]
+    temp += distance_graph[path_list[-1]][path_list[0]]
+    return temp
+
+
+# 交叉
+def cross1(path_list1, path_list2):
+    genes1 = path_list1
+    genes2 = path_list2
+
+    index1 = random.randint(0, len(path_list1) - 2)
+    index2 = random.randint(index1, len(path_list1) - 1)
+
+    pos1_recorder = {value: idx for idx, value in enumerate(genes1)}
+    pos2_recorder = {value: idx for idx, value in enumerate(genes2)}
+    print(index1, index2)
+    for i in range(index1, index2):
+        value1, value2 = genes1[i], genes2[i]
+        pos1, pos2 = pos1_recorder[value2], pos2_recorder[value1]
+        genes1[i], genes1[pos1] = genes1[pos1], genes1[i]
+        genes2[i], genes2[pos2] = genes2[pos2], genes2[i]
+        pos1_recorder[value1], pos1_recorder[value2] = pos1, i
+        pos2_recorder[value1], pos2_recorder[value2] = i, pos2
+
+    return genes1, genes2
+
+
+'''
 class Ga:
 
     def __init__(self, distance_graph, max_iter=config.max_iter):
@@ -179,67 +247,4 @@ class Ga:
             self.best_dislist.append(self.best_total_distance)
         self.best_path.append(self.best_path[0])
         return self.best_path
-
-
-'''
-class TWOPT:
-    def __init__(self, indexs, distance_graph, MAXCOUNT=config.MAXCOUNT):
-        self.cities = indexs
-        self.distance_graph = distance_graph
-        self.MAXCOUNT = MAXCOUNT
-
-    def calDist(self, xindex, yindex):
-        return (np.sum(np.power(self.cities[xindex] - self.cities[yindex], 2))) ** 0.5
-
-    def calPathDist(self, indexList):
-        sum = 0.0
-        for i in range(1, len(indexList)):
-            sum += self.distance_graph[indexList[i]][indexList[i - 1]]
-        return sum
-
-    # path1长度比path2短则返回true
-    def pathCompare(self, path1, path2):
-        if self.calPathDist(path1) <= self.calPathDist(path2):
-            return True
-        return False
-
-    def generate_random_path(self, best_path):
-        a = np.random.randint(len(best_path))
-        while True:
-            b = np.random.randint(len(best_path))
-            if np.abs(a - b) > 1:
-                break
-        if a > b:
-            return b, a, best_path[b:a + 1]
-        else:
-            return a, b, best_path[a:b + 1]
-
-    def reverse_path(self, path):
-        rePath = path.copy()
-        rePath[1:-1] = rePath[-2:0:-1]
-        return rePath
-
-    def update_best_path(self, best_path):
-        count = 0
-        while count < self.MAXCOUNT:
-            # print(self.calPathDist(best_path))
-            # print(best_path.tolist())
-            start, end, path = self.generate_random_path(best_path)
-            rePath = self.reverse_path(path)
-            if self.pathCompare(path, rePath):
-                count += 1
-                continue
-            else:
-                count = 0
-                best_path[start:end + 1] = rePath
-        return best_path
-
-    def train(self):
-        # 随便选择一条可行路径
-        best_path = np.arange(0, len(self.cities))
-        best_path = np.append(best_path, 0)
-        best_path = self.update_best_path(best_path)
-        # self.draw(best_path)
-        # return self.cities[best_path]
-        return best_path
 '''

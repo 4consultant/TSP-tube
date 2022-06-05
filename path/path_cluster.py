@@ -27,7 +27,7 @@ class Cluster:
 
         # 确认不同类簇之间的连接顺序
         centroids_dis = get_distance_list(centroids)
-        centroids_tsp = self.classname(centroids, centroids_dis, 100)
+        centroids_tsp = self.classname(centroids_dis, 100)
         centroids_list = centroids_tsp.train()
 
         # 对每个区域的点进行路径规划
@@ -36,7 +36,7 @@ class Cluster:
             city_cluster1 = np.array(city_cluster[i])
             city_cluster1_dis = get_distance_list(city_cluster1)
 
-            ga1 = self.classname(city_cluster1, city_cluster1_dis)
+            ga1 = self.classname(city_cluster1_dis)
             best_path = ga1.train()
 
             # 局部路径转化为全局路径
