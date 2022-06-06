@@ -92,25 +92,12 @@ class Ga:
     # 变异
     # 2-OPT
     def mutate(self):
-        self.eva_fitness()
-        gene_temp = []
-        gene_mutate = []
         for i in range(self.population_size):
-            old_gen = []
-
             if random.random() < config.prob_mutate:
-                old_gen = self.population[i][:]
-
-                index1 = random.randint(0, self.chromosome_length - 2)
-                index2 = random.randint(index1, self.chromosome_length - 1)
-
-                gene_mutate = old_gen[index1:index2]
-                gene_mutate.reverse()
-                gene_temp = old_gen[:index1] + gene_mutate + old_gen[index2:]
+                gene_temp = mutate_reverse(self.population[i][:])
                 temp = 0
                 for j in range(self.chromosome_length - 1):
                     temp += self.distance_graph[gene_temp[j + 1]][gene_temp[j]]
-
                 t1 = (1. / temp)
                 t2 = self.fitness_value[i]
                 if t1 > t2:
@@ -118,13 +105,9 @@ class Ga:
 
     # 选择
     # 轮盘赌方式
-
     def select(self):
-
-        self.eva_fitness()
-
         new_fitness = []
-        total_fitness = sum(self.fitness_value)
+        total_fitness = sum_list(self.fitness_value)
 
         # 按比例适应度分配
         for i in range(self.population_size):
@@ -135,44 +118,24 @@ class Ga:
             if new_fitness[i] == max(new_fitness):
                 self.best_path = self.population[i][:]
 
-        # 最优路径路程
-        self.best_total_distance = 0
-        for i in range(self.chromosome_length - 1):
-            self.best_total_distance += self.distance_graph[self.best_path[i + 1]
-            ][self.best_path[i]]
-
         # 将n个最好个体随机复制到下一代种群内
         next_population = self.population
         n = int(self.population_size * config.prob_select)
         for i in range(n):
-            total_prob = random.random()
-
-            for j in range(self.population_size):
-                total_prob -= new_fitness[j]
-                if total_prob < 0:
-                    next_population[j] = self.best_path
-                    break
+            temp = select_rws(new_fitness)
+            next_population[temp] = self.best_path
 
         self.population = next_population
 
-    def sum(list):
-
-        total = 0
-        for i in range(len(list)):
-            total += list[i]
-        return total
-
     def next_gen(self):
+        self.eva_fitness()
         self.cross()
         self.mutate()
         self.select()
 
     def train(self):
-        self.create_origin_population()
-
         for i in range(self.max_iter):
             self.next_gen()
-
             self.best_dislist.append(self.best_total_distance)
         self.best_path.append(self.best_path[0])
         return self.best_path

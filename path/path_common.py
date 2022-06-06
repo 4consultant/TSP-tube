@@ -77,6 +77,39 @@ def cross1(path_list1, path_list2):
     return genes1, genes2
 
 
+# 翻转变异
+def mutate_reverse(path_list):
+    old_gen = path_list
+
+    index1 = random.randint(0, len(path_list) - 2)
+    index2 = random.randint(index1, len(path_list) - 1)
+
+    gene_mutate = old_gen[index1:index2]
+    gene_mutate.reverse()
+    gene_temp = old_gen[:index1] + gene_mutate + old_gen[index2:]
+
+    return gene_temp
+
+
+# 选择
+# 轮盘赌方式(正则化适应度列表)
+def select_rws(fitness_list):
+    total_prob = random.random()
+    for i in range(len(fitness_list)):
+        total_prob -= fitness_list[i]
+        if total_prob < 0:
+            result = i
+            break
+    return result
+
+
+def sum_list(fitness_list):
+    total = 0
+    for i in range(len(fitness_list)):
+        total += fitness_list[i]
+    return total
+
+
 '''
 class Ga:
 
@@ -195,7 +228,7 @@ class Ga:
         self.eva_fitness()
 
         new_fitness = []
-        total_fitness = sum(self.fitness_value)
+        total_fitness = sum_list(self.fitness_value)
 
         # 按比例适应度分配
         for i in range(self.population_size):
@@ -226,7 +259,7 @@ class Ga:
 
         self.population = next_population
 
-    def sum(list):
+    def sum_list(list):
 
         total = 0
         for i in range(len(list)):
