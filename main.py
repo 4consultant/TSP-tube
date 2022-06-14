@@ -20,5 +20,5 @@ if __name__ == '__main__':
     result = class1.train()
     end_time = time.time()
     sum_time = end_time - start_time
-    draw(index, result, sum_time)
+    draw_path(index, result, sum_time)
     print("最佳路径的总距离：", get_distance(result))

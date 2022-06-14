@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 
 
 # 画图（坐标；最优路径；运行时长；是否显示坐标，默认不显示）
-def draw(cities, best_path, total_time, label=0):
+def draw_path(cities, best_path, total_time, label=0):
     ax = plt.subplot(111)
     ax.scatter(cities[:, 0], cities[:, 1], marker='o', facecolors='none', edgecolors='k', s=30)
     if label:
@@ -14,3 +14,9 @@ def draw(cities, best_path, total_time, label=0):
     ax.set_title('total time : %i ' % total_time)
     plt.show()
 
+
+def draw_dis_list(best_dis_list):
+    x = range(0, len(best_dis_list))
+    ax = plt.subplot(111)
+    ax.plot(x, best_dis_list)
+    plt.show()
