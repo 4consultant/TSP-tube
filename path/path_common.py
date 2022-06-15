@@ -92,11 +92,13 @@ def mutate_reverse(path_list):
 
 # 选择
 # 轮盘赌方式(正则化适应度列表)
-def select_rws(fitness_list):
-    total_prob = random.random()
+def roulette_wheel_selection(fitness_list):
+    wheel = sum(fitness_list)
+    pick = np.random.uniform(0, wheel)
+    current = 0
     for i in range(len(fitness_list)):
-        total_prob -= fitness_list[i]
-        if total_prob < 0:
+        current += fitness_list[i]
+        if current > pick:
             result = i
             break
     return result

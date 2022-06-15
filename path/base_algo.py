@@ -39,7 +39,6 @@ class GaBase:
         self.fitness_value = []
         self.best_path = []
         self.best_total_distance = 0
-        self.create_origin_population()
         self.best_dis_list = []
 
     # 产生初始种群
@@ -54,13 +53,17 @@ class GaBase:
         for i in range(self.population_size):
             temp = eva_fitness0(self.distance_graph, self.population[i])
             self.fitness_value.append(1. / temp)
-        # 选择适应度最大的个体
-        for i in range(self.population_size):
-            if self.fitness_value[i] == max(self.fitness_value):
-                self.best_path = self.population[i]
-                # print(self.fitness_value[i])
 
+        # 选择适应度最大的个体
+        temp_max = self.fitness_value[0]
+        temp_index = 0
+        for j in range(self.population_size):
+            if self.fitness_value[j] > temp_max:
+                temp_max = self.fitness_value[j]
+                temp_index = j
+        self.best_path = self.population[temp_index]
         self.best_total_distance = eva_fitness0(self.distance_graph, self.best_path)
+
 
     # 交叉
     def cross(self):
@@ -79,34 +82,31 @@ class GaBase:
         for i in range(self.population_size):
             if random.random() < config.prob_mutate:
                 gene_temp = mutate_reverse(self.population[i][:])
-
                 self.population[i] = gene_temp
 
     # 选择
     # 轮盘赌方式
     def select(self):
-        new_fitness = []
-        total_fitness = sum(self.fitness_value)
-        # 按比例适应度分配
-        for i in range(self.population_size):
-            new_fitness.append(self.fitness_value[i] / total_fitness)
 
         # 随机选取n个个体复制到下一代种群内
-        next_population = self.population
+        next_population = []
         for i in range(self.population_size):
-            temp = select_rws(new_fitness)
-            next_population[i] = self.population[temp]
+            temp = roulette_wheel_selection(self.fitness_value)
+            next_population.append(self.population[temp])
+        next_population[0] = self.best_path
         self.population = next_population
 
     def next_gen(self):
-        self.eva_fitness()
         self.select()
         self.cross()
         self.mutate()
 
     def run(self):
+        self.create_origin_population()
+        self.eva_fitness()
         for i in range(self.max_iter):
             self.next_gen()
+            self.eva_fitness()
             self.best_dis_list.append(self.best_total_distance)
         self.best_path.append(self.best_path[0])
         return self.best_path, self.best_dis_list

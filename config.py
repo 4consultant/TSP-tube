@@ -1,11 +1,11 @@
 
 # 遗传算法
-prob_cross = 0.8  # 交叉概率
-prob_mutate = 0.1  # 变异概率
+prob_cross = 0.4  # 交叉概率
+prob_mutate = 0.01  # 变异概率
 prob_select = 0.1  # 选择最优个体的概率
 
 # 公共区域
-max_iter = 100
+max_iter = 200
 GAK = 20  # K-邻域搜索范围
 
 # 模拟退火算法

@@ -56,7 +56,7 @@ class Ga01:
         self.best_path = []
         self.best_dis_list = []
         self.best_total_distance = 0
-        self.create_origin_population()
+        self.global_best_path = []
 
     # 使用贪婪算法产生初始种群
 
@@ -74,11 +74,21 @@ class Ga01:
             temp = eva_fitness0(self.distance_graph, self.population[i])
             self.fitness_value.append(1. / temp)
 
+        # 选择适应度最大的个体
+        temp_max = self.fitness_value[0]
+        temp_index = 0
+        for j in range(self.population_size):
+            if self.fitness_value[j] > temp_max:
+                temp_max = self.fitness_value[j]
+                temp_index = j
+        self.best_path = self.population[temp_index]
+        self.best_total_distance = eva_fitness0(self.distance_graph, self.best_path)
+
     # 交叉
     # 部分匹配交叉PMX
     # 交叉
     def cross(self):
-        # random.shuffle(self.population)
+        random.shuffle(self.population)
         for i in range(self.population_size - 1, 2):
             genes1 = self.population[i][:]
             genes2 = self.population[i + 1][:]
@@ -99,47 +109,31 @@ class Ga01:
                 t1 = (1. / temp)
                 t2 = self.fitness_value[i]
                 if t1 > t2:
-                    self.population[i][:] = gene_temp
+                    self.population[i] = gene_temp
 
     # 选择
     # 轮盘赌方式
     def select(self):
-        self.eva_fitness()
-
-        new_fitness = []
-        total_fitness = sum_list(self.fitness_value)
-
-        # 按比例适应度分配
+        # 随机选取n个个体复制到下一代种群内
+        next_population = []
         for i in range(self.population_size):
-            new_fitness.append(self.fitness_value[i] / total_fitness)
-
-        # 选择适应度最大的个体
-        temp_max = 0
-        temp_index = 0
-        for j in range(self.population_size):
-            if new_fitness[j] > temp_max:
-                temp_max = new_fitness[j]
-                temp_index = j
-        self.best_path = self.population[temp_index]
-        self.best_total_distance = eva_fitness0(self.distance_graph, self.best_path)
-
-        # 将n个最好个体随机复制到下一代种群内
-        next_population = self.population
-        n = int(self.population_size * config.prob_select)
-        for i in range(n):
-            temp = select_rws(new_fitness)
-            next_population[temp] = self.best_path
-
+            temp = roulette_wheel_selection(self.fitness_value)
+            next_population.append(self.population[temp])
+        next_population[0] = self.global_best_path
         self.population = next_population
 
     def next_gen(self):
-        self.select()
         self.cross()
         self.mutate()
+        self.select()
 
     def run(self):
+        self.create_origin_population()
+        self.eva_fitness()
+        self.global_best_path = self.best_path
         for i in range(self.max_iter):
             self.next_gen()
+            self.eva_fitness()
             self.best_dis_list.append(self.best_total_distance)
         self.best_path.append(self.best_path[0])
         return self.best_path, self.best_dis_list
@@ -147,6 +141,7 @@ class Ga01:
 
 class IGSA:
     def __init__(self, distance_graph, max_iter=config.max_iter):
+        self.global_best_path = None
         self.distance_graph = distance_graph
         self.chromosome_length = len(self.distance_graph[0])
         self.population_size = 50
@@ -158,17 +153,26 @@ class IGSA:
         self.template_initial = config.template_initial
         self.decrease = config.decrease
         self.template_end = config.template_end
+        self.best_total_distance = []
+        self.next_population = []
+        self.best_path_list = []
 
     # 计算适应度
     def eva_fitness(self):
         self.fitness_value = []
-        temp_list = []
         for i in range(self.population_size):
-            temp_list.append(eva_fitness0(self.distance_graph, self.population[i]))
-        temp_max = max(temp_list)
+            temp = eva_fitness0(self.distance_graph, self.population[i])
+            self.fitness_value.append(1. / temp)
+
+        # 选择适应度最大的个体
+        temp_max = self.fitness_value[0]
+        temp_index = 0
         for j in range(self.population_size):
-            temp = 1 - temp_list[j] / temp_max
-            self.fitness_value.append(temp)
+            if self.fitness_value[j] > temp_max:
+                temp_max = self.fitness_value[j]
+                temp_index = j
+        self.best_path = self.population[temp_index]
+        self.best_total_distance = eva_fitness0(self.distance_graph, self.best_path)
 
     # 交叉
     # 部分匹配交叉PMX
@@ -195,34 +199,22 @@ class IGSA:
                 t1 = (1. / temp)
                 t2 = self.fitness_value[i]
                 if t1 > t2:
-                    self.population[i][:] = gene_temp
+                    self.population[i] = gene_temp
 
     # 模拟退火变异
     def mutateSa(self):
         gene_temp = mutate_reverse(self.population)
-        self.population = gene_temp
+        self.next_population = gene_temp
 
     # 选择
     # 轮盘赌方式
     def select(self):
-        new_fitness = []
-        total_fitness = sum_list(self.fitness_value)
-        print(total_fitness)
-        # 按比例适应度分配
-        for i in range(self.population_size):
-            new_fitness.append(self.fitness_value[i] / total_fitness)
-
-        # 选择适应度最大的个体
-        for i in range(self.population_size):
-            if new_fitness[i] == max(new_fitness):
-                self.best_path = self.population[i]
-
         # 随机选取n个个体复制到下一代种群内
-        next_population = self.population
+        next_population = []
         for i in range(self.population_size):
-            temp = select_rws(new_fitness)
-            next_population[i] = self.population[temp]
-
+            temp = roulette_wheel_selection(self.fitness_value)
+            next_population.append(self.population[temp])
+        next_population[0] = self.global_best_path
         self.population = next_population
 
     def metropolis(self):
@@ -233,15 +225,21 @@ class IGSA:
             self.population = self.next_population
 
     def run(self):
+        self.eva_fitness()
+        self.global_best_path = self.best_path
         for i in range(self.max_iter):
             self.eva_fitness()
             self.select()
             self.cross()
             self.mutate1()
+            self.best_path_list.append(self.best_total_distance)
         self.population = self.best_path
-        template_now = self.template_initial
-        while template_now > self.template_end:
+        self.template_now = self.template_initial
+        while self.template_now > self.template_end:
             for i in range(self.max_iter):
                 self.mutateSa()
                 self.metropolis()
-        return self.population
+                self.best_path_list.append(eva_fitness0(self.distance_graph, self.population))
+            self.template_now *= self.decrease
+        self.best_path.append(self.best_path[0])
+        return self.population, self.best_path_list
