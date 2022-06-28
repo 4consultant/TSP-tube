@@ -46,7 +46,7 @@ class Cluster:
 
         return centroids_list, best_path1
 
-    def train(self):
+    def run(self):
         temp_node1 = self.local_best_path[self.centroids_list[0]]
 
         # 查找类簇间距离最近的点
@@ -115,5 +115,5 @@ class Cluster:
 
             temp_node1 = connect_result
             connect_result.append(connect_result[0])
-
+        # return connect_result
         return self.data[connect_result]  # 返回排序后的坐标

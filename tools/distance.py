@@ -2,11 +2,22 @@ import numpy as np
 
 
 # 获取路径的总距离
-def get_distance(distance_graph, list1):
-    #list1 = list1[0:-1]
+def get_distance0(indexs):
+    # list1 = list1[0:-1]
+    total_distance = 0
+    for i in range(len(indexs) - 1):
+        total_distance += (pow((indexs[i, 0] - indexs[i+1, 0]), 2) + pow((indexs[i, 1] - indexs[i+1, 1]), 2)) ** 0.5
+    # total_distance += (pow((indexs[0, 0] - indexs[-1, 0]), 2) + pow((indexs[0, 1] - indexs[-1, 1]), 2)) ** 0.5
+
+    return total_distance
+
+
+# 获取路径的总距离
+def get_distance1(distance_graph, list1):
+    # list1 = list1[0:-1]
     total_distance = 0
     for i in range(len(list1) - 1):
-        total_distance += distance_graph[list1[i+1]][list1[i]]
+        total_distance += distance_graph[list1[i + 1]][list1[i]]
 
     return total_distance
 

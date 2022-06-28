@@ -2,8 +2,8 @@ from matplotlib import pyplot as plt
 import math
 
 
-# 画图（坐标；最优路径；运行时长；是否显示坐标，默认不显示）
-def draw_path(cities, best_path, total_time, label=0):
+# 画图（坐标；最优路径；最优路径路程；运行时长；是否显示坐标，默认不显示）
+def draw_path(cities, best_path, best_length, total_time, label=0):
     ax = plt.subplot(111)
     ax.scatter(cities[:, 0], cities[:, 1], marker='o', facecolors='none', edgecolors='k', s=30)
     if label:
@@ -12,7 +12,7 @@ def draw_path(cities, best_path, total_time, label=0):
                     verticalalignment='center', horizontalalignment='right', rotation=0)
 
     ax.plot(best_path[:, 0], best_path[:, 1], color='blue')
-    ax.set_title('total time : %i ' % total_time)
+    ax.set_title("total time:{:.2f}s  total dis:{}".format(total_time, best_length))
     plt.show()
 
 
@@ -24,10 +24,11 @@ def draw_dis_list(best_dis_list):
 
 
 def draw_dis_lists(lists):
-    col = 4
-    row = math.ceil(len(lists) / 4)
-    x = range(0, len(lists[0]))
+    col = 1
+    row = len(lists)
+
     for i in range(len(lists)):
-        plt.subplot(row, col, i+1)
+        x = range(0, len(lists[i]))
+        plt.subplot(row, col, i + 1)
         plt.plot(x, lists[i])
     plt.show()

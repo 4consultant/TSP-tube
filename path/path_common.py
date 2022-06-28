@@ -124,3 +124,29 @@ def Metropolis0(distance_new, distance_old, T):
             result = 0
     return result
 
+
+'''
+def HMO(distance_graph, path_index, k):
+    sort_path = sorted(distance_graph[path_index])
+    k_path = sort_path[:k]  # 距离点path_index最近的k个点
+    temp_kdis = 0  # 距离点path_index最近的k个点的距离之和
+    prod_c = []  # 距离点path_index最近的k个点的距离与距离之和的比值
+    prod_csum = []  # 距离点path_index最近的k个点的距离的依次累加值
+    for i in range(k):
+        temp_kdis += (1. / distance_graph[path_index][k_path[i]])
+    for j in range(k):
+        prod_c.append((1. / distance_graph[path_index][k_path[j]]) / temp_kdis)   
+    for n in range(k):
+        temp = 0
+        for m in range(n):
+            temp += prod_c[m]
+            prod_csum.append(temp)
+    r = random.random()
+    if r <= prod_csum[0]:
+        temp_result = k_path[0]
+    for h in range(k):
+        if prod_csum[h - 1] < r <= prod_csum[h]:
+            temp_result = k_path[h]
+    
+    return temp_result
+'''
