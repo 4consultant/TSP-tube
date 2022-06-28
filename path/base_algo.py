@@ -67,8 +67,7 @@ class TwoOpt:
         best_path = self.update_best_path(best_path)
         best_length = self.calPathDist(best_path)
 
-        return best_path
-
+        return best_path, best_length
 
 
 # 基本遗传算法
@@ -395,4 +394,3 @@ class PSO(object):
         best_path.append(best_path[0])
         # 画出最终路径
         return self.location[best_path], self.iter_y
-

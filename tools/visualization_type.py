@@ -12,7 +12,7 @@ def draw_path(cities, best_path, best_length, total_time, label=0):
                     verticalalignment='center', horizontalalignment='right', rotation=0)
 
     ax.plot(best_path[:, 0], best_path[:, 1], color='blue')
-    ax.set_title("total time:{:.2f}s  total dis:{}".format(total_time, best_length))
+    ax.set_title("total time:{:.2f}s  total dis:{:.2f}".format(total_time, best_length))
     plt.show()
 
 

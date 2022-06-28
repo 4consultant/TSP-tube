@@ -26,7 +26,8 @@ if __name__ == '__main__':
     # draw_dis_list(result_lengths)
 
     # 使用聚类方法
-    classname = path.base_algo.TwoOpt  # 聚类内使用的优化算法
+    # classname = path.base_algo.TwoOpt  # 聚类内使用的优化算法
+    classname = path.advanced_algo.TS
     class1 = path_cluster.Cluster(index, classname)
     result_path = class1.run()
     result_length = get_distance0(result_path)

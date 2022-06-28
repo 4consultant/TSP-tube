@@ -6,7 +6,7 @@ prob_mutate = 0.05  # 变异概率
 prob_select = 0.1  # 选择最优个体的概率
 
 # 公共区域
-max_iter = 500
+max_iter = 100
 GAK = 20  # K-邻域搜索范围
 
 # 模拟退火算法
